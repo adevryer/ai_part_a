@@ -3,7 +3,7 @@
 
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
-from .algorithms import find_starting_positions, depth_limited_search, Problem
+from .algorithms import find_starting_positions, find_all_placements, Problem
 
 
 def search(
@@ -35,7 +35,7 @@ def search(
     for position in positions:
         print()
         print(f"NEW POSITION STARTING NOW: {position}")
-        depth_limited_search(Problem(position, board))
+        find_all_placements(Problem(position, board))
 
     print(render_board(board, target, ansi=True))
 
