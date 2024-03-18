@@ -23,17 +23,6 @@ def find_starting_positions(board: dict[Coord, PlayerColor]):
     return starting_positions
 
 
-def get_sets(curr_path: list[Coord, PlayerColor]):
-    rows = []
-    cols = []
-
-    for r, c in curr_path:
-        rows.append(r)
-        cols.append(c)
-
-    return set(rows), set(cols)
-
-
 def find_all_placements(problem, limit=SEARCH_LIMIT):
     """ Adapted from AIMA's Python Library function for depth-limited search """
     placements = []
@@ -43,16 +32,6 @@ def find_all_placements(problem, limit=SEARCH_LIMIT):
             new_path = sorted(node.path())
             if new_path not in placements:
                 placements.append(new_path)
-
-        elif curr_limit == 2:
-            row_set, col_set = get_sets(node.path())
-            if len(row_set) == 1 or len(col_set) == 1:
-                pass
-                # print("might be straight line")
-
-            for child in node.expand(curr_problem):
-                if child not in node.path():
-                    recursive_dls(child, curr_problem, curr_limit - 1)
 
         else:
             for child in node.expand(curr_problem):
