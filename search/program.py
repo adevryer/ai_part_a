@@ -3,6 +3,7 @@
 
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
+from .algorithms import find_starting_positions, depth_limited_search, Problem
 
 
 def search(
@@ -28,6 +29,15 @@ def search(
     # The render_board() function is handy for debugging. It will print out a
     # board state in a human-readable format. If your terminal supports ANSI
     # codes, set the `ansi` flag to True to print a colour-coded version!
+    positions = find_starting_positions(board)
+    print(f"COULD START AT {positions}")
+    print()
+
+    for position in positions:
+        print()
+        print("NEW POSITION STARTING NOW:")
+        depth_limited_search(Problem(position, board))
+
     print(render_board(board, target, ansi=True))
 
     # Do some impressive AI stuff here to find the solution...
