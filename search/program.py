@@ -31,11 +31,10 @@ def search(
     # codes, set the `ansi` flag to True to print a colour-coded version!
     positions = find_starting_positions(board)
     print(f"COULD START AT {positions}")
-    print()
 
     for position in positions:
         print()
-        print("NEW POSITION STARTING NOW:")
+        print(f"NEW POSITION STARTING NOW: {position}")
         depth_limited_search(Problem(position, board))
 
     print(render_board(board, target, ansi=True))

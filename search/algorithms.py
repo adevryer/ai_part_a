@@ -1,6 +1,6 @@
 from .core import PlayerColor, Coord, Direction
 
-SEARCH_LIMIT = 3
+SEARCH_LIMIT = 4
 
 
 def find_starting_positions(board: dict[Coord, PlayerColor]):
@@ -23,24 +23,37 @@ def find_starting_positions(board: dict[Coord, PlayerColor]):
     return starting_positions
 
 
-def is_straight_line():
-    return False
+def get_sets(curr_path: list[Coord, PlayerColor]):
+    rows = []
+    cols = []
+
+    for r, c in curr_path:
+        rows.append(r)
+        cols.append(c)
+
+    return set(rows), set(cols)
 
 
 def depth_limited_search(problem, limit=SEARCH_LIMIT):
+    """ Adapted from AIMA's Python Library function for depth-limited search """
     placements = []
 
     def recursive_dls(node, curr_problem, curr_limit):
-        if curr_limit == 0:
+        if curr_limit == 1:
             new_path = node.path()
             if new_path not in placements:
                 placements.append(new_path)
             print(placements)
-        elif curr_limit == 1:
-            print("could be straight line")
+
+        elif curr_limit == 2:
+            row_set, col_set = get_sets(node.path())
+            if len(row_set) == 1 or len(col_set) == 1:
+                print("might be straight line")
+
             for child in node.expand(curr_problem):
                 if child not in node.path():
                     recursive_dls(child, curr_problem, curr_limit - 1)
+
         else:
             for child in node.expand(curr_problem):
                 if child not in node.path():
@@ -105,9 +118,15 @@ class Problem:
         state. The result would typically be a list, but if there are
         many actions, consider yielding them one at a time in an
         iterator, rather than building them all at once."""
+        #pieces can be placed in four possible directions on the gameboard
         possible_moves = [state.__add__(Direction.Up), state.__add__(Direction.Down), state.__add__(Direction.Left),
                           state.__add__(Direction.Right)]
-        elements = [element for element in possible_moves if element not in self.current_map]
-        elements = [element for element in elements if element not in last_moves]
-        print(f"ELEMENTS: {elements}")
-        return elements
+
+        #cannot be placed if a piece is already taking that space
+        possible_moves = [element for element in possible_moves if element not in self.current_map]
+
+        #cannot be placed if we have already placed a piece there during this iteration of piece forming
+        possible_moves = [element for element in possible_moves if element not in last_moves]
+
+        print(f"ELEMENTS: {possible_moves}")
+        return possible_moves
