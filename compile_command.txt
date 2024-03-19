@@ -1,1 +1,2 @@
 python -m search < test-vis1.csv
+python -m search < test-vis2.csv

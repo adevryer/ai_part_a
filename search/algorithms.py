@@ -24,7 +24,9 @@ def find_starting_positions(board: dict[Coord, PlayerColor]):
 
 
 def find_all_placements(problem, limit=SEARCH_LIMIT):
-    """ Adapted from AIMA's Python Library function for depth-limited search """
+    """ Recursively finds all possible combinations of pieces which can be placed from a given starting coordinate.
+    Adapted from AIMA's Python Library function for depth-limited search"""
+
     placements = []
 
     def recursive_dls(node, curr_problem, curr_limit):
@@ -39,20 +41,14 @@ def find_all_placements(problem, limit=SEARCH_LIMIT):
                     recursive_dls(child, curr_problem, curr_limit - 1)
 
     # Body of depth_limited_search:
-    recursive_dls(Node(problem.initial, None), problem, limit)
+    recursive_dls(PlacementNode(problem.initial, None), problem, limit)
     print(f"FINAL: {sorted(placements)}")
     return placements
 
 
-class Node:
-    """A node in a search tree. Contains a pointer to the parent (the node
-    that this is a successor of) and to the actual state for this node. Note
-    that if a state is arrived at by two paths, then there are two nodes with
-    the same state. Also includes the action that got us to this state, and
-    the total path_cost (also known as g) to reach the node. Other functions
-    may add an f and h value; see best_first_graph_search and astar_search for
-    an explanation of how the f and h values are handled. You will not need to
-    subclass this class."""
+class PlacementNode:
+    """ A node for a potential placement of a square on the board to form a piece. Adapted and modified from the
+    AIMA's Python Library function for a search tree node."""
 
     def __init__(self, state, parent=None):
         """Create a search tree Node, derived from a parent by an action."""
@@ -67,8 +63,8 @@ class Node:
                 for next_state in problem.actions(self.state, self.path())]
 
     def child_node(self, next_state):
-        """[Figure 3.10]"""
-        next_node = Node(next_state, self)
+        """Create a new child node for a possible placement action."""
+        next_node = PlacementNode(next_state, self)
         return next_node
 
     def path(self):
@@ -80,24 +76,18 @@ class Node:
         return list(reversed(path_back))
 
 
-class Problem:
-    """The abstract class for a formal problem. You should subclass
-    this and implement the methods actions and result, and possibly
-    __init__, goal_test, and path_cost. Then you will create instances
-    of your subclass and solve them with the various search functions."""
+class PlacementProblem:
+    """ A class which defines the constructors and possible actions for finding all possible piece positions on the
+    current game board. Adapted from AIMA's Python Library """
 
     def __init__(self, initial, current_map):
-        """The constructor specifies the initial state, and possibly a goal
-        state, if there is a unique goal. Your subclass's constructor can add
-        other arguments."""
+        """ Initialise the problem with the initial starting coordinate and the current game map """
         self.initial = initial
         self.current_map = current_map
 
     def actions(self, state, last_moves):
-        """Return the actions that can be executed in the given
-        state. The result would typically be a list, but if there are
-        many actions, consider yielding them one at a time in an
-        iterator, rather than building them all at once."""
+        """ Return the list of actions which can be achieved given the current state of the game board and the last
+        moves done in parent search tree nodes"""
         # pieces can be placed in four possible directions on the gameboard
         possible_moves = [state.__add__(Direction.Up), state.__add__(Direction.Down), state.__add__(Direction.Left),
                           state.__add__(Direction.Right)]
