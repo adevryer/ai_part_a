@@ -1,3 +1,6 @@
+# COMP30024 Artificial Intelligence, Semester 1 2024
+# Project Part A: Single Player Tetress
+
 from .core import PlayerColor, Coord, Direction
 
 SEARCH_LIMIT = 4
@@ -42,7 +45,7 @@ def find_all_placements(problem, limit=SEARCH_LIMIT):
 
     # Body of depth_limited_search:
     recursive_dls(PlacementNode(problem.initial, None), problem, limit)
-    print(f"FINAL: {sorted(placements)}")
+    #print(f"FINAL: {sorted(placements)}")
     return placements
 
 
@@ -58,7 +61,7 @@ class PlacementNode:
 
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
-        print(f"PATH = {self.path()}")
+        #print(f"PATH = {self.path()}")
         return [self.child_node(next_state)
                 for next_state in problem.actions(self.state, self.path())]
 
@@ -105,5 +108,5 @@ class PlacementProblem:
         # cannot be placed if we have already placed a piece there during this iteration of piece forming
         possible_moves = [element for element in possible_moves if element not in last_moves]
 
-        print(f"ELEMENTS: {possible_moves}")
+        #print(f"ELEMENTS: {possible_moves}")
         return possible_moves

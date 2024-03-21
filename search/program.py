@@ -1,9 +1,10 @@
 # COMP30024 Artificial Intelligence, Semester 1 2024
 # Project Part A: Single Player Tetress
 
+import itertools
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
-from .algorithms import find_starting_positions, find_all_placements, PlacementProblem
+from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
 
 
 def search(
@@ -29,6 +30,7 @@ def search(
     # The render_board() function is handy for debugging. It will print out a
     # board state in a human-readable format. If your terminal supports ANSI
     # codes, set the `ansi` flag to True to print a colour-coded version!
+    """
     positions = find_starting_positions(board)
     print(f"COULD START AT {positions}")
 
@@ -36,6 +38,20 @@ def search(
         print()
         print(f"NEW POSITION STARTING NOW: {position}")
         find_all_placements(PlacementProblem(position, board))
+    """
+
+    possible_actions = []
+    placement_positions = find_starting_positions(board)
+    for position in placement_positions:
+        possible_actions += find_all_placements(PlacementProblem(position, board))
+
+    print(possible_actions)
+    possible_actions = list(possible_actions for possible_actions, _ in itertools.groupby(possible_actions))
+
+    for element in possible_actions:
+        print(PlaceAction(element[0], element[1], element[2], element[3]))
+
+    print(target)
 
     print(render_board(board, target, ansi=True))
 
