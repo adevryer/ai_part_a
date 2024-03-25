@@ -2,15 +2,15 @@
 # Project Part A: Single Player Tetress
 
 import itertools
-from .core import PlayerColor, Coord, Direction, PlaceAction
+from queue import PriorityQueue
+from .core import PlayerColor, Coord, Direction, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
 
 PATH_COST = 4
+LARGEST_DISTANCE = 2 * BOARD_N
 
 
-
-
-class Problem:
+class SearchProblem:
     """The abstract class for a formal problem. You should subclass
     this and implement the methods actions and result, and possibly
     __init__, goal_test, and path_cost. Then you will create instances
@@ -28,12 +28,22 @@ class Problem:
         place_actions = []
 
         placement_positions = find_starting_positions(state)
+        print(placement_positions)
+
         for position in placement_positions:
-            possible_actions + find_all_placements(PlacementProblem(position, state))
+            #print(position)
+            current_actions = find_all_placements(PlacementProblem(position, state))
+            #print(current_actions)
+            for element in current_actions:
+                #print(f"Element: {element}")
+                possible_actions.append(element)
+
 
         possible_actions = list(possible_actions for possible_actions, _ in itertools.groupby(possible_actions))
+        #print(f"NO DUPLICATES: {possible_actions}")
+
         for element in possible_actions:
-            place_actions += PlaceAction(element[0], element[1], element[2], element[3])
+            place_actions.append(PlaceAction(element[0], element[1], element[2], element[3]))
 
         return place_actions
 
@@ -45,24 +55,58 @@ class Problem:
         new_state[action.c4] = PlayerColor.RED
         return new_state
 
+    def heuristic(self, state):
+        print("HI")
+        #print(state)
+        closest_distance = LARGEST_DISTANCE
+
+        closest_positions = find_starting_positions(state)
+        for coord in closest_positions:
+            first = coord.__sub__(self.target)
+            second = self.target.__sub__(coord)
+
+            row_distance = min(first.r, second.r)
+            col_distance = min(first.c, second.c)
+
+            for i in range(0, BOARD_N):
+                if Coord(i, self.target.c) not in state:
+                    row_distance += 1
+
+            for i in range(0, BOARD_N):
+                if Coord(self.target.r, i) not in state:
+                    col_distance += 1
+
+            min_distance = min(row_distance, col_distance)
+
+            if min(row_distance, col_distance) < closest_distance:
+                closest_distance = min_distance
+
+        return closest_distance
+
     def goal_test(self, state):
-        """Return True if the state is a goal. The default method compares the
-        state to self.goal or checks for state in self.goal if it is a
-        list, as specified in the constructor. Override this method if
-        checking against a single self.goal is not enough."""
-        pass
+        row_success = True
+        column_success = True
+
+        for i in range(0, BOARD_N):
+            if Coord(self.target.r, i) not in state:
+                row_success = False
+                break
+
+        for i in range(0, BOARD_N):
+            if Coord(i, self.target.c) not in state:
+                column_success = False
+                break
+
+        if row_success or column_success:
+            return True
+
+        return False
 
     def path_cost(self, prev_cost):
         return prev_cost + PATH_COST
 
 
-
-
-
-
-
-
-class Node:
+class SearchNode:
     """A node in a search tree. Contains a pointer to the parent (the node
     that this is a successor of) and to the actual state for this node. Note
     that if a state is arrived at by two paths, then there are two nodes with
@@ -88,7 +132,7 @@ class Node:
     def child_node(self, problem, action):
         """[Figure 3.10]"""
         next_state = problem.result(self.state, action)
-        next_node = Node(next_state, self, action, problem.path_cost(self.path_cost))
+        next_node = SearchNode(next_state, self, action, problem.path_cost(self.path_cost))
         return next_node
 
     def solution(self):
@@ -109,7 +153,7 @@ class Node:
     # want in other contexts.]
 
     def __eq__(self, other):
-        return isinstance(other, Node) and self.state == other.state
+        return isinstance(other, SearchNode) and self.state == other.state
 
     def __hash__(self):
         # We use the hash value of the state

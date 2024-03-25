@@ -5,6 +5,7 @@ import itertools
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
+from .play_algorithms import SearchProblem, SearchNode
 
 
 def search(
@@ -40,18 +41,32 @@ def search(
         find_all_placements(PlacementProblem(position, board))
     """
 
+    """
     possible_actions = []
     placement_positions = find_starting_positions(board)
     for position in placement_positions:
         possible_actions += find_all_placements(PlacementProblem(position, board))
 
-    print(possible_actions)
     possible_actions = list(possible_actions for possible_actions, _ in itertools.groupby(possible_actions))
 
+    print("POSSIBLE:")
     for element in possible_actions:
         print(PlaceAction(element[0], element[1], element[2], element[3]))
 
-    print(target)
+    #print(target)
+    """
+
+    print(PlaceAction(Coord(0,1), Coord(0,2), Coord(1,2), Coord(2,2)))
+    problem = SearchProblem(board, target)
+    actions = problem.actions(board)
+    new_map = problem.result(board, actions[10])
+
+    print(render_board(new_map, target, ansi=True))
+
+    """
+    print(f"CHECK HERE: {Coord(1, 0).__sub__(target)}")
+    print(f"CHECK HERE: {target.__sub__(Coord(1, 0))}")
+    """
 
     print(render_board(board, target, ansi=True))
 
