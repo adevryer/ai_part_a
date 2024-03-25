@@ -5,6 +5,7 @@ import itertools
 from queue import PriorityQueue
 from .core import PlayerColor, Coord, Direction, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
+from .utils import render_board
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
@@ -48,7 +49,7 @@ class SearchProblem:
         return place_actions
 
     def result(self, state, action: PlaceAction):
-        new_state = state
+        new_state = state.copy()
         new_state[action.c1] = PlayerColor.RED
         new_state[action.c2] = PlayerColor.RED
         new_state[action.c3] = PlayerColor.RED
@@ -116,23 +117,23 @@ class SearchNode:
     an explanation of how the f and h values are handled. You will not need to
     subclass this class."""
 
-    def __init__(self, state, parent=None, action=None, path_cost=0):
+    def __init__(self, state, problem, parent=None, action=None, path_cost=0):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
         self.parent = parent
         self.action = action
+        self.problem = problem
         self.path_cost = path_cost
         self.depth = parent.depth + 1 if parent else 0
 
-    def expand(self, problem):
+    def expand(self):
         """List the nodes reachable in one step from this node."""
-        return [self.child_node(problem, action)
-                for action in problem.actions(self.state)]
+        return [self.child_node(action)
+                for action in self.problem.actions(self.state)]
 
-    def child_node(self, problem, action):
-        """[Figure 3.10]"""
-        next_state = problem.result(self.state, action)
-        next_node = SearchNode(next_state, self, action, problem.path_cost(self.path_cost))
+    def child_node(self, action):
+        next_state = self.problem.result(self.state, action)
+        next_node = SearchNode(next_state, self.problem, self, action, self.problem.path_cost(self.path_cost))
         return next_node
 
     def solution(self):

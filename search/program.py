@@ -56,12 +56,18 @@ def search(
     #print(target)
     """
 
-    print(PlaceAction(Coord(0,1), Coord(0,2), Coord(1,2), Coord(2,2)))
-    problem = SearchProblem(board, target)
-    actions = problem.actions(board)
-    new_map = problem.result(board, actions[10])
+    #print(PlaceAction(Coord(0,1), Coord(0,2), Coord(1,2), Coord(2,2)))
+    #problem = SearchProblem(board, target)
+    #actions = problem.actions(board)
+    #new_map = problem.result(board, actions[10])
 
-    print(render_board(new_map, target, ansi=True))
+    #print(render_board(new_map, target, ansi=True))
+
+    node = SearchNode(board, SearchProblem(board, target))
+    new_nodes = node.expand()
+    for new_node in new_nodes:
+        print(render_board(new_node.state, target, ansi=True))
+
 
     """
     print(f"CHECK HERE: {Coord(1, 0).__sub__(target)}")
