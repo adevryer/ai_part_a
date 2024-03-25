@@ -3,9 +3,8 @@
 
 import itertools
 from queue import PriorityQueue
-from .core import PlayerColor, Coord, Direction, PlaceAction, BOARD_N
+from .core import PlayerColor, Coord, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
-from .utils import render_board
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
@@ -58,7 +57,6 @@ class SearchProblem:
 
     def heuristic(self, state):
         closest_distance = row_distance = col_distance = LARGEST_DISTANCE
-        #change to check coord on map currently instead of possible placements
 
         for key, value in state.items():
             if value == PlayerColor.RED:
@@ -90,16 +88,15 @@ class SearchProblem:
         return closest_distance
 
     def goal_test(self, state):
-        row_success = True
-        column_success = True
+        row_success = column_success = True
 
         for i in range(0, BOARD_N):
-            if Coord(self.target.r, i) not in state:
+            if Coord(self.target.r, i) not in state.keys():
                 row_success = False
                 break
 
         for i in range(0, BOARD_N):
-            if Coord(i, self.target.c) not in state:
+            if Coord(i, self.target.c) not in state.keys():
                 column_success = False
                 break
 
