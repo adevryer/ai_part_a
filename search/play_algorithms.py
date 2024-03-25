@@ -57,30 +57,35 @@ class SearchProblem:
         return new_state
 
     def heuristic(self, state):
-        print("HI")
-        #print(state)
-        closest_distance = LARGEST_DISTANCE
+        closest_distance = row_distance = col_distance = LARGEST_DISTANCE
+        #change to check coord on map currently instead of possible placements
 
-        closest_positions = find_starting_positions(state)
-        for coord in closest_positions:
-            first = coord.__sub__(self.target)
-            second = self.target.__sub__(coord)
+        for key, value in state.items():
+            if value == PlayerColor.RED:
+                first = key.__sub__(self.target)
+                second = self.target.__sub__(key)
 
-            row_distance = min(first.r, second.r)
-            col_distance = min(first.c, second.c)
+                curr_row_min = min(first.c - 1 if first.c > 0 else 0, second.c - 1 if second.c > 0 else 0)
+                curr_col_min = min(first.r - 1 if first.r > 0 else 0, second.r - 1 if second.r > 0 else 0)
 
-            for i in range(0, BOARD_N):
-                if Coord(i, self.target.c) not in state:
-                    row_distance += 1
+                if (curr_row_min < row_distance):
+                    row_distance = curr_row_min
 
-            for i in range(0, BOARD_N):
-                if Coord(self.target.r, i) not in state:
-                    col_distance += 1
+                if (curr_col_min < col_distance):
+                    col_distance = curr_col_min
 
-            min_distance = min(row_distance, col_distance)
+        for i in range(0, BOARD_N):
+            if Coord(i, self.target.c) not in state.keys():
+                row_distance += 1
 
-            if min(row_distance, col_distance) < closest_distance:
-                closest_distance = min_distance
+        for i in range(0, BOARD_N):
+            if Coord(self.target.r, i) not in state.keys():
+                col_distance += 1
+
+        min_distance = min(row_distance, col_distance)
+
+        if min(row_distance, col_distance) < closest_distance:
+            closest_distance = min_distance
 
         return closest_distance
 

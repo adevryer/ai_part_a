@@ -66,6 +66,7 @@ def search(
     node = SearchNode(board, SearchProblem(board, target))
     new_nodes = node.expand()
     for new_node in new_nodes:
+        print(f"HEURISTIC FOR BELOW MAP IS {new_node.problem.heuristic(new_node.state)}")
         print(render_board(new_node.state, target, ansi=True))
 
 
