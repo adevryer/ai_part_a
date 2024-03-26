@@ -1,11 +1,9 @@
 # COMP30024 Artificial Intelligence, Semester 1 2024
 # Project Part A: Single Player Tetress
 
-import itertools
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
-from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
-from .play_algorithms import SearchProblem, SearchNode, astar_search
+from .play_algorithms import SearchProblem, astar_search, SearchNode
 
 
 def search(
@@ -56,18 +54,18 @@ def search(
     #print(target)
     """
 
-    #print(PlaceAction(Coord(0,1), Coord(0,2), Coord(1,2), Coord(2,2)))
-    #problem = SearchProblem(board, target)
-    #actions = problem.actions(board)
-    #new_map = problem.result(board, actions[10])
+    # print(PlaceAction(Coord(0,1), Coord(0,2), Coord(1,2), Coord(2,2)))
+    # problem = SearchProblem(board, target)
+    # actions = problem.actions(board)
+    # new_map = problem.result(board, actions[10])
 
-    #print(render_board(new_map, target, ansi=True))
+    # print(render_board(new_map, target, ansi=True))
 
-    #node = SearchNode(board)
-    #new_nodes = node.expand(problem)
-    #for new_node in new_nodes:
-        #print(f"HEURISTIC FOR BELOW MAP IS {problem.heuristic(new_node.state)}")
-        #print(render_board(new_node.state, target, ansi=True))
+    # node = SearchNode(board)
+    # new_nodes = node.expand(problem)
+    # for new_node in new_nodes:
+        # print(f"HEURISTIC FOR BELOW MAP IS {problem.heuristic(new_node.state)}")
+        # print(render_board(new_node.state, target, ansi=True))
 
     """
     print(f"CHECK HERE: {Coord(1, 0).__sub__(target)}")
@@ -93,7 +91,7 @@ def search(
     result = astar_search(problem)
 
     if result is not None:
-        print(render_board(result.state, target, ansi=True))
+        print(f"SOLUTION MAP:\n{render_board(result.state, target, ansi=True)}")
         return result.solution()
     else:
         return None

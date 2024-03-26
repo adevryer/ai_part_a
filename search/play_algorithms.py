@@ -13,7 +13,7 @@ LARGEST_DISTANCE = 2 * BOARD_N
 
 
 @dataclass(order=True)
-class PrioritizedItem:
+class PrioritisedItem:
     """ Class defining an entry in the priority queue which is only sorted based on priority. Copied from the Python
     Standard Libray Queue documentation page."""
     priority: int
@@ -75,10 +75,10 @@ class SearchProblem:
                 curr_row_min = min(first.c - 1 if first.c > 0 else 0, second.c - 1 if second.c > 0 else 0)
                 curr_col_min = min(first.r - 1 if first.r > 0 else 0, second.r - 1 if second.r > 0 else 0)
 
-                if (curr_row_min < row_distance):
+                if curr_row_min < row_distance:
                     row_distance = curr_row_min
 
-                if (curr_col_min < col_distance):
+                if curr_col_min < col_distance:
                     col_distance = curr_col_min
 
         for i in range(0, BOARD_N):
@@ -174,16 +174,9 @@ class SearchNode:
 
 
 def astar_search(problem):
-    """Search the nodes with the lowest f scores first.
-    You specify the function f(node) that you want to minimize; for example,
-    if f is a heuristic estimate to the goal, then we have greedy best
-    first search; if f is node.depth then we have breadth-first search.
-    There is a subtlety: the line "f = memoize(f, 'f')" means that the f
-    values will be cached on the nodes as they are computed. So after doing
-    a best first search you can examine the f values of the path returned."""
     node = SearchNode(problem.initial)
     queue = PriorityQueue()
-    queue.put(PrioritizedItem(node.path_cost + problem.heuristic(node.state), node))
+    queue.put(PrioritisedItem(node.path_cost + problem.heuristic(node.state), node))
 
     while not queue.empty():
         retrieval = queue.get()
@@ -192,11 +185,11 @@ def astar_search(problem):
         if problem.goal_test(node.state):
             return node
 
-        #if sorted(node.solution()) not in explored:
-        #explored.append(sorted(node.solution()))
+        # if sorted(node.solution()) not in explored:
+        # explored.append(sorted(node.solution()))
 
         for child in node.expand(problem):
-            #if sorted(child.solution()) not in explored:
-            queue.put(PrioritizedItem(child.path_cost + problem.heuristic(child.state), child))
+            # if sorted(child.solution()) not in explored:
+            queue.put(PrioritisedItem(child.path_cost + problem.heuristic(child.state), child))
 
     return None

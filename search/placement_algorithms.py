@@ -62,8 +62,7 @@ class PlacementNode:
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
         #print(f"PATH = {self.path()}")
-        return [self.child_node(next_state)
-                for next_state in problem.actions(self.state, self.path())]
+        return [self.child_node(next_state) for next_state in problem.actions(self.state, self.path())]
 
     def child_node(self, next_state):
         """Create a new child node for a possible placement action."""
