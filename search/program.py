@@ -5,7 +5,7 @@ import itertools
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
-from .play_algorithms import SearchProblem, SearchNode
+from .play_algorithms import SearchProblem, SearchNode, astar_search
 
 
 def search(
@@ -63,19 +63,15 @@ def search(
 
     #print(render_board(new_map, target, ansi=True))
 
-    node = SearchNode(board, SearchProblem(board, target))
-    new_nodes = node.expand()
-    for new_node in new_nodes:
-        print(f"HEURISTIC FOR BELOW MAP IS {new_node.problem.heuristic(new_node.state)}")
-        print(render_board(new_node.state, target, ansi=True))
-
+    #node = SearchNode(board)
+    #new_nodes = node.expand(problem)
+    #for new_node in new_nodes:
+        #print(f"HEURISTIC FOR BELOW MAP IS {problem.heuristic(new_node.state)}")
+        #print(render_board(new_node.state, target, ansi=True))
 
     """
     print(f"CHECK HERE: {Coord(1, 0).__sub__(target)}")
     print(f"CHECK HERE: {target.__sub__(Coord(1, 0))}")
-    """
-
-    print(render_board(board, target, ansi=True))
 
     # Do some impressive AI stuff here to find the solution...
     # ...
@@ -91,3 +87,13 @@ def search(
         PlaceAction(Coord(1, 8), Coord(2, 8), Coord(3, 8), Coord(4, 8)),
         PlaceAction(Coord(5, 8), Coord(6, 8), Coord(7, 8), Coord(8, 8)),
     ]
+    """
+
+    problem = SearchProblem(board, target)
+    result = astar_search(problem)
+
+    if result is not None:
+        print(render_board(result.state, target, ansi=True))
+        return result.solution()
+    else:
+        return None

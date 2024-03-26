@@ -3,11 +3,21 @@
 
 import itertools
 from queue import PriorityQueue
+from dataclasses import dataclass, field
+from typing import Any
 from .core import PlayerColor, Coord, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
+
+
+@dataclass(order=True)
+class PrioritizedItem:
+    """ Class defining an entry in the priority queue which is only sorted based on priority. Copied from the Python
+    Standard Libray Queue documentation page."""
+    priority: int
+    item: Any = field(compare=False)
 
 
 class SearchProblem:
@@ -28,19 +38,18 @@ class SearchProblem:
         place_actions = []
 
         placement_positions = find_starting_positions(state)
-        print(placement_positions)
+        # print(placement_positions)
 
         for position in placement_positions:
-            #print(position)
+            # print(position)
             current_actions = find_all_placements(PlacementProblem(position, state))
-            #print(current_actions)
+            # print(current_actions)
             for element in current_actions:
-                #print(f"Element: {element}")
+                # print(f"Element: {element}")
                 possible_actions.append(element)
 
-
         possible_actions = list(possible_actions for possible_actions, _ in itertools.groupby(possible_actions))
-        #print(f"NO DUPLICATES: {possible_actions}")
+        # print(f"NO DUPLICATES: {possible_actions}")
 
         for element in possible_actions:
             place_actions.append(PlaceAction(element[0], element[1], element[2], element[3]))
@@ -119,23 +128,21 @@ class SearchNode:
     an explanation of how the f and h values are handled. You will not need to
     subclass this class."""
 
-    def __init__(self, state, problem, parent=None, action=None, path_cost=0):
+    def __init__(self, state, parent=None, action=None, path_cost=0):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
         self.parent = parent
         self.action = action
-        self.problem = problem
         self.path_cost = path_cost
         self.depth = parent.depth + 1 if parent else 0
 
-    def expand(self):
+    def expand(self, problem):
         """List the nodes reachable in one step from this node."""
-        return [self.child_node(action)
-                for action in self.problem.actions(self.state)]
+        return [self.child_node(action, problem) for action in problem.actions(self.state)]
 
-    def child_node(self, action):
-        next_state = self.problem.result(self.state, action)
-        next_node = SearchNode(next_state, self.problem, self, action, self.problem.path_cost(self.path_cost))
+    def child_node(self, action, problem):
+        next_state = problem.result(self.state, action)
+        next_node = SearchNode(next_state, self, action, problem.path_cost(self.path_cost))
         return next_node
 
     def solution(self):
@@ -164,3 +171,32 @@ class SearchNode:
         # object itself to quickly search a node
         # with the same state in a Hash Table
         return hash(self.state)
+
+
+def astar_search(problem):
+    """Search the nodes with the lowest f scores first.
+    You specify the function f(node) that you want to minimize; for example,
+    if f is a heuristic estimate to the goal, then we have greedy best
+    first search; if f is node.depth then we have breadth-first search.
+    There is a subtlety: the line "f = memoize(f, 'f')" means that the f
+    values will be cached on the nodes as they are computed. So after doing
+    a best first search you can examine the f values of the path returned."""
+    node = SearchNode(problem.initial)
+    queue = PriorityQueue()
+    queue.put(PrioritizedItem(node.path_cost + problem.heuristic(node.state), node))
+
+    while not queue.empty():
+        retrieval = queue.get()
+        node = retrieval.item
+
+        if problem.goal_test(node.state):
+            return node
+
+        #if sorted(node.solution()) not in explored:
+        #explored.append(sorted(node.solution()))
+
+        for child in node.expand(problem):
+            #if sorted(child.solution()) not in explored:
+            queue.put(PrioritizedItem(child.path_cost + problem.heuristic(child.state), child))
+
+    return None
