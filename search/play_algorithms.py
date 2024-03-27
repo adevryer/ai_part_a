@@ -3,12 +3,14 @@
 
 import itertools
 import functools
+from collections import defaultdict
 from queue import PriorityQueue
 from dataclasses import dataclass, field
 from typing import Any
 from .core import PlayerColor, Coord, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
 from .helpers import dict_hash
+from .utils import render_board
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
@@ -64,6 +66,48 @@ class SearchProblem:
         new_state[action.c2] = PlayerColor.RED
         new_state[action.c3] = PlayerColor.RED
         new_state[action.c4] = PlayerColor.RED
+
+        if not self.goal_test(new_state):
+            rows = {action.c1.r, action.c2.r, action.c3.r, action.c4.r}
+            cols = {action.c1.c, action.c2.c, action.c3.c, action.c4.c}
+
+            row_duplicate = set()
+            col_duplicate = set()
+
+            #print(render_board(new_state, Coord(9, 10), ansi=True))
+
+            for element in rows:
+                duplicates = True
+
+                for i in range(0, BOARD_N):
+                    if Coord(element, i) not in new_state.keys():
+                        duplicates = False
+
+                if duplicates:
+                    row_duplicate.add(element)
+
+            for element in cols:
+                duplicates = True
+
+                for i in range(0, BOARD_N):
+                    if Coord(i, element) not in new_state.keys():
+                        duplicates = False
+
+                if duplicates:
+                    col_duplicate.add(element)
+
+            #print(row_duplicate, col_duplicate)
+
+            for element in row_duplicate:
+                for i in range(0, BOARD_N):
+                    if Coord(element, i) in new_state.keys():
+                        new_state.pop(Coord(element, i))
+
+            for element in col_duplicate:
+                for i in range(0, BOARD_N):
+                    if Coord(i, element) in new_state.keys():
+                        new_state.pop(Coord(i, element))
+
         return new_state
 
     def heuristic(self, state):
