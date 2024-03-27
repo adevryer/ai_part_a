@@ -2,11 +2,13 @@
 # Project Part A: Single Player Tetress
 
 import itertools
+import functools
 from queue import PriorityQueue
 from dataclasses import dataclass, field
 from typing import Any
 from .core import PlayerColor, Coord, PlaceAction, BOARD_N
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
+from .helpers import dict_hash
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
@@ -170,13 +172,14 @@ class SearchNode:
         # stored in the node instead of the node
         # object itself to quickly search a node
         # with the same state in a Hash Table
-        return hash(self.state)
+        return dict_hash(self.solution())
 
 
 def astar_search(problem):
     node = SearchNode(problem.initial)
     queue = PriorityQueue()
     queue.put(PrioritisedItem(node.path_cost + problem.heuristic(node.state), node))
+    in_queue = set()
 
     while not queue.empty():
         retrieval = queue.get()
@@ -185,11 +188,10 @@ def astar_search(problem):
         if problem.goal_test(node.state):
             return node
 
-        # if sorted(node.solution()) not in explored:
-        # explored.append(sorted(node.solution()))
-
         for child in node.expand(problem):
-            # if sorted(child.solution()) not in explored:
-            queue.put(PrioritisedItem(child.path_cost + problem.heuristic(child.state), child))
+            curr_hash = child.__hash__()
+            if curr_hash not in in_queue:
+                queue.put(PrioritisedItem(child.path_cost + problem.heuristic(child.state), child))
+                in_queue.add(curr_hash)
 
     return None

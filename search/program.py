@@ -4,6 +4,7 @@
 from .core import PlayerColor, Coord, PlaceAction
 from .utils import render_board
 from .play_algorithms import SearchProblem, astar_search, SearchNode
+from .helpers import dict_hash
 
 
 def search(
