@@ -7,13 +7,15 @@ from collections import defaultdict
 from queue import PriorityQueue
 from dataclasses import dataclass, field
 from typing import Any
-from .core import PlayerColor, Coord, PlaceAction, BOARD_N
+from .core import PlayerColor, Coord, PlaceAction, BOARD_N, Direction
 from .placement_algorithms import find_starting_positions, find_all_placements, PlacementProblem
-from .helpers import dict_hash
+from .helpers import dict_hash, find_gaps
 from .utils import render_board
 
 PATH_COST = 4
 LARGEST_DISTANCE = 2 * BOARD_N
+
+heuristic_items = defaultdict(int)
 
 
 @dataclass(order=True)
@@ -21,6 +23,7 @@ class PrioritisedItem:
     """ Class defining an entry in the priority queue which is only sorted based on priority. Copied from the Python
     Standard Libray Queue documentation page."""
     priority: int
+    heuristic_value: int = field(compare=False)
     item: Any = field(compare=False)
 
 
@@ -74,7 +77,7 @@ class SearchProblem:
             row_duplicate = set()
             col_duplicate = set()
 
-            #print(render_board(new_state, Coord(9, 10), ansi=True))
+            # print(render_board(new_state, Coord(9, 10), ansi=True))
 
             for element in rows:
                 duplicates = True
@@ -96,7 +99,7 @@ class SearchProblem:
                 if duplicates:
                     col_duplicate.add(element)
 
-            #print(row_duplicate, col_duplicate)
+            # print(row_duplicate, col_duplicate)
 
             for element in row_duplicate:
                 for i in range(0, BOARD_N):
@@ -111,7 +114,7 @@ class SearchProblem:
         return new_state
 
     def heuristic(self, state):
-        closest_distance = row_distance = col_distance = LARGEST_DISTANCE
+        row_distance = col_distance = LARGEST_DISTANCE
 
         for key, value in state.items():
             if value == PlayerColor.RED:
@@ -127,6 +130,9 @@ class SearchProblem:
                 if curr_col_min < col_distance:
                     col_distance = curr_col_min
 
+        # print(row_distance, col_distance)
+
+        """
         for i in range(0, BOARD_N):
             if Coord(i, self.target.c) not in state.keys():
                 row_distance += 1
@@ -134,13 +140,10 @@ class SearchProblem:
         for i in range(0, BOARD_N):
             if Coord(self.target.r, i) not in state.keys():
                 col_distance += 1
+        """
 
-        min_distance = min(row_distance, col_distance)
-
-        if min(row_distance, col_distance) < closest_distance:
-            closest_distance = min_distance
-
-        return closest_distance
+        fill_row, fill_col = find_gaps(state, self.target, row_distance, col_distance)
+        return min(fill_row + row_distance, fill_col + col_distance)
 
     def goal_test(self, state):
         row_success = column_success = True
@@ -222,20 +225,24 @@ class SearchNode:
 def astar_search(problem):
     node = SearchNode(problem.initial)
     queue = PriorityQueue()
-    queue.put(PrioritisedItem(node.path_cost + problem.heuristic(node.state), node))
-    in_queue = set()
+    heuristic = problem.heuristic(node.state)
+    queue.put(PrioritisedItem(node.path_cost + heuristic, heuristic, node))
+    seen = set()
 
     while not queue.empty():
         retrieval = queue.get()
         node = retrieval.item
+        #print(f"PRIORITY: {retrieval.priority}\n{render_board(node.state, problem.target, ansi=True)}")
 
-        if problem.goal_test(node.state):
-            return node
+        if retrieval.heuristic_value == 0:
+            if problem.goal_test(node.state):
+                return node
 
         for child in node.expand(problem):
             curr_hash = child.__hash__()
-            if curr_hash not in in_queue:
-                queue.put(PrioritisedItem(child.path_cost + problem.heuristic(child.state), child))
-                in_queue.add(curr_hash)
+            if curr_hash not in seen:
+                heuristic = problem.heuristic(child.state)
+                queue.put(PrioritisedItem(child.path_cost + heuristic, heuristic, child))
+                seen.add(curr_hash)
 
     return None
