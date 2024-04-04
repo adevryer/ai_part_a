@@ -160,8 +160,8 @@ class SearchProblem:
 
         for key, value in state.items():
             if value == PlayerColor.RED:
-                first = key.__sub__(self.target)
-                second = self.target.__sub__(key)
+                first = key - self.target
+                second = self.target - key
 
                 # Find the minimum distance between the closest red square and the associated row/column
                 # of the target coordinate
@@ -202,7 +202,7 @@ class SearchProblem:
 
 
 def astar_search(problem):
-    node_number = 1
+    # node_number = 1
 
     # Create an initial node for search and initialise a PQ for new nodes
     node = SearchNode(problem.initial)
@@ -215,9 +215,11 @@ def astar_search(problem):
         # Get the next item with the lowest cost from the queue
         retrieval = queue.get()
         node = retrieval.item
-        print(f"NODE NUMBER: {node_number}")
-        print(f"PRIORITY: {retrieval.priority}\n{render_board(node.state, problem.target, ansi=True)}")
-        node_number += 1
+
+        # BELOW INSTRUCTIONS USED TO SHOW PROGRESS OF SEARCH
+        # print(f"NODE NUMBER: {node_number}")
+        # print(f"PRIORITY: {retrieval.priority}\n{render_board(node.state, problem.target, ansi = True)}")
+        # node_number += 1
 
         # Only check if it is a goal state if the value of the heuristic function is 0
         if retrieval.heuristic_value == 0:
@@ -226,7 +228,7 @@ def astar_search(problem):
 
         # Expand the current state and add these children to the queue
         for child in node.expand(problem):
-            curr_hash = child.__hash__()
+            curr_hash = hash(child)
 
             # Do not include nodes that we have already inserted into the PQ
             if curr_hash not in seen:

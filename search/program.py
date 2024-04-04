@@ -31,7 +31,7 @@ def search(
     result = astar_search(problem)
 
     if result is not None:
-        print(f"SOLUTION MAP:\n{render_board(result.state, target, ansi=True)}")
+        # print(f"SOLUTION MAP:\n{render_board(result.state, target, ansi=True)}")
         return result.solution()
     else:
         return None

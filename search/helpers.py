@@ -18,8 +18,8 @@ def find_starting_positions(board: dict[Coord, PlayerColor]):
 
     for coord in player_pieces:
         # We can place new squares in these four directions
-        possible_positions = [coord.__add__(Direction.Up), coord.__add__(Direction.Down), coord.__add__(Direction.Left),
-                              coord.__add__(Direction.Right)]
+        possible_positions = [coord + Direction.Up, coord + Direction.Down, coord + Direction.Left,
+                              coord + Direction.Right]
 
         for element in possible_positions:
             if element not in board:
@@ -48,7 +48,7 @@ def dict_hash(solution):
         hash_val += str(element[0])
         hash_val += str(element[1])
 
-    return hash_val
+    return int(hash_val)
 
 
 def find_gaps(board: dict[Coord, PlayerColor], target: Coord, row_dist: int, col_dist: int):
@@ -65,7 +65,7 @@ def find_gaps(board: dict[Coord, PlayerColor], target: Coord, row_dist: int, col
     while init_coord.r != target.r or first:
         # Move down the current column by one each time
         first = False
-        init_coord = init_coord.__add__(Direction.Down)
+        init_coord = init_coord + Direction.Down
         if init_coord not in board.keys():
             # We have found an empty space, record its length
             empty_spaces += 1
@@ -79,7 +79,7 @@ def find_gaps(board: dict[Coord, PlayerColor], target: Coord, row_dist: int, col
     first = True
     while init_coord.c != target.c or first:
         first = False
-        init_coord = init_coord.__add__(Direction.Right)
+        init_coord = init_coord + Direction.Right
         if init_coord not in board.keys():
             empty_spaces += 1
         else:

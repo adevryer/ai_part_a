@@ -47,16 +47,17 @@ class PlacementProblem:
         """ Return the list of actions which can be achieved given the current state of the game board and the last
         moves done in parent search tree nodes"""
         # Pieces can be placed in four possible directions on the gameboard
-        possible_moves = [state.__add__(Direction.Up), state.__add__(Direction.Down), state.__add__(Direction.Left),
-                          state.__add__(Direction.Right)]
+        possible_moves = [state + Direction.Up, state + Direction.Down, state + Direction.Left,
+                          state+ Direction.Right]
 
         # Check previous squares in the current piece and add these to the possible placement list
         for element in last_moves:
             if element is not state:
-                possible_moves.append(element.__add__(Direction.Up))
-                possible_moves.append(element.__add__(Direction.Down))
-                possible_moves.append(element.__add__(Direction.Left))
-                possible_moves.append(element.__add__(Direction.Right))
+                possible_moves.append(element + Direction.Up)
+                possible_moves.append(element + Direction.Down)
+                possible_moves.append(element + Direction.Left)
+                possible_moves.append(element + Direction.Right)
+                possible_moves.append(element + Direction.Right)
 
         # Cannot be placed if a piece is already taking that space
         possible_moves = [element for element in possible_moves if element not in self.current_map]
