@@ -46,9 +46,9 @@ class PlacementProblem:
     def actions(self, state, last_moves):
         """ Return the list of actions which can be achieved given the current state of the game board and the last
         moves done in parent search tree nodes"""
-        # Pieces can be placed in four possible directions on the gameboard
+        # Pieces can be placed in four possible directions on the game board
         possible_moves = [state + Direction.Up, state + Direction.Down, state + Direction.Left,
-                          state+ Direction.Right]
+                          state + Direction.Right]
 
         # Check previous squares in the current piece and add these to the possible placement list
         for element in last_moves:
@@ -56,7 +56,6 @@ class PlacementProblem:
                 possible_moves.append(element + Direction.Up)
                 possible_moves.append(element + Direction.Down)
                 possible_moves.append(element + Direction.Left)
-                possible_moves.append(element + Direction.Right)
                 possible_moves.append(element + Direction.Right)
 
         # Cannot be placed if a piece is already taking that space
