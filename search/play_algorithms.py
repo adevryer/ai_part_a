@@ -202,7 +202,7 @@ class SearchProblem:
 
 
 def astar_search(problem):
-    # node_number = 1
+    #node_number = 1
 
     # Create an initial node for search and initialise a PQ for new nodes
     node = SearchNode(problem.initial)
@@ -219,15 +219,16 @@ def astar_search(problem):
         # BELOW INSTRUCTIONS USED TO SHOW PROGRESS OF SEARCH
         # print(f"NODE NUMBER: {node_number}")
         # print(f"PRIORITY: {retrieval.priority}\n{render_board(node.state, problem.target, ansi = True)}")
-        # node_number += 1
 
         # Only check if it is a goal state if the value of the heuristic function is 0
         if retrieval.heuristic_value == 0:
             if problem.goal_test(node.state):
+                # print(f"NUMBER OF NODES EXPANDED: {node_number}")
                 return node
 
         # Expand the current state and add these children to the queue
         for child in node.expand(problem):
+            # node_number += 1
             curr_hash = hash(child)
 
             # Do not include nodes that we have already inserted into the PQ
@@ -237,4 +238,5 @@ def astar_search(problem):
                 seen.add(curr_hash)
 
     # Queue is empty and we have not found a solution, we cannot solve for the particular board state
+    # print(f"NUMBER OF NODES EXPANDED: {node_number}")
     return None
