@@ -202,7 +202,7 @@ class SearchProblem:
 
 
 def astar_search(problem):
-    #node_number = 1
+    # node_number = 1
 
     # Create an initial node for search and initialise a PQ for new nodes
     node = SearchNode(problem.initial)
@@ -215,6 +215,7 @@ def astar_search(problem):
         # Get the next item with the lowest cost from the queue
         retrieval = queue.get()
         node = retrieval.item
+        # node_number += 1
 
         # BELOW INSTRUCTIONS USED TO SHOW PROGRESS OF SEARCH
         # print(f"NODE NUMBER: {node_number}")
@@ -228,7 +229,6 @@ def astar_search(problem):
 
         # Expand the current state and add these children to the queue
         for child in node.expand(problem):
-            # node_number += 1
             curr_hash = hash(child)
 
             # Do not include nodes that we have already inserted into the PQ
